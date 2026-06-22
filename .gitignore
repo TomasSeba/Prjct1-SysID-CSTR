@@ -1,0 +1,32 @@
+# MATLAB temporary files
+*.asv
+*.m~
+*.autosave
+*.slxc
+*.mex*
+*.mlappinstall
+
+# Simulink cache
+slprj/
+*.slxc
+
+# MATLAB generated files
+*.fig
+*.mat
+
+# Data files - revisar antes de subir
+*.csv
+*.xlsx
+
+# Reports generated
+*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python, if used
+__pycache__/
+*.pyc
+.venv/
+env/
