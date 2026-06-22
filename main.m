@@ -1,0 +1,65 @@
+%% This is the main script where the diferent functions are ran
+
+% Loading parameters
+p = parameters_cstr;
+
+% Initial conditions
+x0 = [0.0376621; 2.1216; 0.143553; 0.226519; 138.642]; % In order: A, B, C, M, T
+
+% Inputs
+u = [1000, 950, 5];
+
+% Simulation time
+tspan = 0:0.01:10; % Time range, in hours
+t_step = 5; % Time where the step will happen
+
+% Simulation
+options = odeset('RelTol',3e-14);
+[t,x] = ode45(@(t,x) cstr_ode(t,x,u,p),tspan,x0,options);
+
+m_CW = zeros(length(t),1);
+for i = 1:length(t)
+    u_i = inputs(t(i), u(1), u(2), u(3));
+    m_CW(i) = u_i;
+end
+
+%% Graphing
+C_A = x(:,1); 
+C_B = x(:,2); 
+C_C = x(:,3); 
+C_M = x(:,4);
+T = x(:,5);
+
+% Plotting the temperature profile over time
+figure;
+plot(t, T);
+xlabel('Time (hours)');
+ylabel('Temperature (°F)');
+title('Temperature Profile in CSTR');
+grid on;
+
+% Plotting the concentration of each component
+figure;
+plot(t,C_A,t,C_B,t,C_C,t,C_M);
+xlabel('Time (hours)');
+ylabel('Concentration (lbmole/ft3)');
+title('Temperature Profile in CSTR');
+legend('A','B','C','M')
+grid on;
+
+%% System identification
+
+G = system_ident(T,m_CW,0.01,2,1);
+
+%% Comparing systems
+t_sim = linspace(0,10,1001);
+m_CW_sim = zeros(length(t_sim),1);
+for i = 1:length(t_sim)
+    u_i = inputs(t_sim(i), u(1), u(2), u(3));
+    m_CW_sim(i) = u_i;
+end
+
+dT = lsim(tf8,m_CW_sim,t_sim);
+T_sim = T(1) + dT - dT(2);
+T_sim(1) = T_sim(1) + dT(2);
+
