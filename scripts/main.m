@@ -1,4 +1,9 @@
 %% This is the main script where the diferent functions are ran
+clear; clc
+
+
+% Adding routes
+addpath('../src');
 
 % Loading parameters
 p = parameters_cstr;
@@ -7,14 +12,14 @@ p = parameters_cstr;
 x0 = [0.0376621; 2.1216; 0.143553; 0.226519; 138.642]; % In order: A, B, C, M, T
 
 % Inputs
-u = [1000, 950, 5];
+u = [1000, 900, 5];
 
 % Simulation time
 tspan = 0:0.01:10; % Time range, in hours
 t_step = 5; % Time where the step will happen
 
 % Simulation
-options = odeset('RelTol',3e-14);
+options = odeset('RelTol',1e-12);
 [t,x] = ode45(@(t,x) cstr_ode(t,x,u,p),tspan,x0,options);
 
 m_CW = zeros(length(t),1);
@@ -43,13 +48,17 @@ figure;
 plot(t,C_A,t,C_B,t,C_C,t,C_M);
 xlabel('Time (hours)');
 ylabel('Concentration (lbmole/ft3)');
-title('Temperature Profile in CSTR');
-legend('A','B','C','M')
+title('Concentrations in CSTR');
+legend('A','B','C','M');
 grid on;
 
 %% System identification
 
-G = system_ident(T,m_CW,0.01,2,1);
+G = system_ident(T,m_CW,0.01,2,1); 
+% In this case, the output variable is the temperature, the inlet the cooling water flow rate, 
+% the sampling time defined is of 0.01h and the plant is considered to be
+% of second-order. Given that it has overshoot and settling time, it also
+% has a zero.
 
 %% Comparing systems
 t_sim = linspace(0,10,1001);
@@ -59,7 +68,14 @@ for i = 1:length(t_sim)
     m_CW_sim(i) = u_i;
 end
 
-dT = lsim(tf8,m_CW_sim,t_sim);
+dT = lsim(G,m_CW_sim - mean(m_CW_sim(t_sim < 5)),t_sim);
 T_sim = T(1) + dT - dT(2);
 T_sim(1) = T_sim(1) + dT(2);
 
+figure
+plot(t_sim,T_sim,t, T)
+xlabel('Time (hours)');
+ylabel('Temperature (°F)');
+title('Temperature Profile in CSTR');
+legend('From Second-Order TF', 'From the non-linear model')
+grid on;

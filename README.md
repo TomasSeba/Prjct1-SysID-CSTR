@@ -14,6 +14,8 @@ The nonlinear CSTR model includes:
 - Arrhenius reaction kinetics
 - Cooling water heat transfer model
 
+It is based in the example 9-4 "Startup of a CSTR", from Fogler's book "Elements of Chemical Reaction Engineering".
+
 ## Workflow
 
 1. Define process parameters.
