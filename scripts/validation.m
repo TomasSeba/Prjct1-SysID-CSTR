@@ -3,7 +3,6 @@
 
 % Running main
 main;
-close all
 
 % Simulating a broader step
 u = [1000, 900, 5];
@@ -58,9 +57,9 @@ T_1050 = x_1050(:,5);
 t_sample = 0.01;
 
 % Cleaning up data
-T_900_clean = T_900 - min(T_900);
+T_900_clean = T_900 - mean(T_900(t < 5));
 m_CW_900_clean = m_CW_900 - m_CW_900(1);
-T_1050_clean = T_1050 - min(T_1050);
+T_1050_clean = T_1050 - mean(T_900(t < 5));
 m_CW_1050_clean = m_CW_1050 - m_CW_1050(1);
 
 % Using the System Identification Toolbox

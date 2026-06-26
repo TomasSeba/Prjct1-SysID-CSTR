@@ -88,3 +88,11 @@ ylabel('Temperature (°F)');
 title('Temperature Profile in CSTR');
 legend('From Second-Order TF', 'From the non-linear model')
 grid on;
+
+% Comparing again
+T_clean = T - mean(T(t < 5));
+m_CW_clean = m_CW - m_CW(1);
+
+DAT_950 = iddata(T_clean(:),m_CW_clean(:),0.01);
+Comp_950 = figure(Name='Step down 50');
+compare(DAT_950,G_1p,G_2p1z,G_arx)
