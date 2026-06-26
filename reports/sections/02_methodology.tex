@@ -1,0 +1,184 @@
+As mentioned in the introduction, the main equations for modeling the reactor consider the mass and energy balances, the reaction kinetics and the heat transfer associated with the system. 
+
+Because of this, the modelling is pretty straight forward. The reaction considered is between ethylene oxide (A) and water (B) to produce ethylene glycol (C). The reaction is assumed to be irreversible and first order with respect to both reactants. It is catalyzed by sulphuric acid, and the effect of it is considered constant in the rate law. Methanol (M) is also present in the system. The chemical reactions is as follows:
+
+\[
+\ce{C2H4O + H2O -> C2H6O2}
+\]
+
+Or, in our notation:
+
+\[
+\ce{A + B -> C}
+\]
+
+The main parameters of the system are explained throughly in the example provided in the book, but a brief summary is provided here. The main parameters are given in the table~\ref{tab:model_parameters}. 
+
+\begin{table}[H]
+    \centering
+    \caption{Model parameters for the ethylene oxide hydration CSTR.}
+    \label{tab:model_parameters}
+    \begin{tabular}{lll}
+        \toprule
+        Symbol & Value & Unit \\
+        \midrule
+        $V$ & 66.81 & ft$^3$ \\
+        $UA$ & 16000 & Btu/h\,$^\circ$F \\
+        \midrule
+        $k_0$ & $16.96 \times 10^{12}$ & ft$^{3}$ \\
+        $E_a$ & 32400 & Btu/lbmol \\
+        $R$ & 1.9872 & Btu/lbmol\,$^\circ$R \\
+        $\Delta H_{\mathrm{rxn}}$ & -36000 & Btu/lbmol A \\
+        \midrule
+        $C_{p,A}$ & 35 & Btu/lbmol\,$^\circ$F \\
+        $C_{p,B}$ & 18 & Btu/lbmol\,$^\circ$F \\
+        $C_{p,C}$ & 46 & Btu/lbmol\,$^\circ$F \\
+        $C_{p,M}$ & 19.5 & Btu/lbmol\,$^\circ$F \\
+        \midrule
+        $T_0$ & 75 & $^\circ$F \\
+        $F_{A0}$ & 80 & lbmol/h \\
+        $F_{B0}$ & 1000 & lbmol/h \\
+        $F_{M0}$ & 100 & lbmol/h \\
+        \midrule
+        $\rho_A$ & 0.923 & lbmol/ft$^3$ \\
+        $\rho_B$ & 3.45 & lbmol/ft$^3$ \\
+        $\rho_M$ & 1.54 & lbmol/ft$^3$ \\
+        $v_0$ & 441.46 & ft$^3$/h \\
+        \midrule
+        $C_{A0}$ & 0.1812 & lbmol/ft$^3$ \\
+        $C_{B0}$ & 2.2652 & lbmol/ft$^3$ \\
+        $C_{M0}$ & 0.2265 & lbmol/ft$^3$ \\
+        \midrule
+        $T_{a1}$ & 60 & $^\circ$F \\
+        $C_{p,CW}$ & 18 & Btu/lbmol\,$^\circ$F \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The example from the book mainly focuses on the effects of the startup of the reactor, and it is particularly interested in avoiding the possible runaway reaction that can occur, given that the reaction is exothermic. Instead, we're interested in determining the steady state of the system, and how we can obtain an input output model, particularly taking into account the effect of the cooling water flow rate on the reactor temperature. 
+
+\section{Main equations for the system}
+
+There are several equations that govern the system, and they are derived from the mass and energy balances. This include mole balances, energy balances, reaction kinetics, and heat transfer. The main equations are as follows:
+
+\subsubsection*{Mole balance: Ethylene oxide, A}
+\begin{equation}
+    \frac{dC_A}{dt}
+    =
+    r_A
+    +
+    \frac{(C_{A0}-C_A)v_0}{V}
+    \label{eq:mole_balance_A}
+\end{equation}
+
+\subsubsection*{Mole balance: Water, B}
+\begin{equation}
+    \frac{dC_B}{dt}
+    =
+    r_B
+    +
+    \frac{(C_{B0}-C_B)v_0}{V}
+    \label{eq:mole_balance_B}
+\end{equation}
+
+\subsubsection*{Mole balance: Ethylene glycol, C}
+\begin{equation}
+    \frac{dC_C}{dt}
+    =
+    r_C
+    -
+    \frac{C_C v_0}{V}
+    \label{eq:mole_balance_C}
+\end{equation}
+
+\subsubsection*{Mole balance: Methanol, M}
+\begin{equation}
+    \frac{dC_M}{dt}
+    =
+    \frac{(C_{M0}-C_M)v_0}{V}
+    \label{eq:mole_balance_M}
+\end{equation}
+
+\subsubsection*{Kinetics: Rate law}
+\begin{equation}
+    -r_A
+    =
+    k C_A
+    \label{eq:rate_law}
+\end{equation}
+
+\subsubsection*{Kinetics: Arrhenius equation}
+\begin{equation}
+    k
+    =
+    k_0
+    \exp\left(
+        -\frac{E_a}{RT}
+    \right)
+    \label{eq:arrhenius}
+\end{equation}
+
+\subsubsection*{Reaction relation: Stoichiometry}
+\begin{equation}
+    -r_A
+    =
+    -r_B
+    =
+    r_C
+    \label{eq:stoichiometry}
+\end{equation}
+
+\subsubsection*{Heat transfer: Heat transfer rate}
+\begin{equation}
+    \dot{Q}
+    =
+    m_{CW} C_{p,CW}
+    (T_{a1} - T)
+    \left[
+        1
+        -
+        \exp\left(
+            -\frac{UA}{m_{CW} C_{p,CW}}
+        \right)
+    \right]
+    \label{eq:heat_transfer}
+\end{equation}
+
+\subsubsection*{Energy balance: Reactor energy balance}
+\begin{equation}
+    \frac{dT}{dt}
+    =
+    \frac{
+        \dot{Q}
+        -
+        F_{A0} \sum_i \theta_i C_{p,i}
+        +
+        \Delta H_{\mathrm{rxn}}(r_A V)
+    }{
+        \sum_i N_i C_{p,i}
+    }
+    \label{eq:energy_balance}
+\end{equation}
+
+The initial conditions for the the system were obtained by simulating the system and checking for its steady state values. They are given in the table~\ref{tab:initial_conditions}. 
+
+\begin{table}[H]
+    \centering
+    \caption{Initial conditions for the CSTR model.}
+    \label{tab:initial_conditions}
+    \begin{tabular}{lll}
+        \toprule
+        Name & Value & Unit \\
+        \midrule
+        Ethylene oxide concentration, $C_A(0)$ & 0.0376621 & lbmol/ft$^3$ \\
+        Water concentration, $C_B(0)$ & 2.1216 & lbmol/ft$^3$ \\
+        Ethylene glycol concentration, $C_C(0)$ & 0.143553 & lbmol/ft$^3$ \\
+        Methanol concentration, $C_M(0)$ & 0.226519 & lbmol/ft$^3$ \\
+        Reactor temperature, $T(0)$ & 138.642 & $^\circ$F \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+With all this information, we can now proceed to simulate the response of the system to different values of cooling water rate, in order to see its effect on the reactor temperature. As a way to preparate, intuitively we know that if the supply is increased, the reactor temperature must decrease, and inversely, if the supply is decreased, the reactor temperature must increase. This is because the cooling water flow rate is directly related to the heat transfer rate, and therefore to the energy balance of the system.
+
+The tools used for simulating this system are MATLAB and the System Identification Toolbox. The simulation is done by using the \texttt{ode45} function, which is a numerical solver for ordinary differential equations.
